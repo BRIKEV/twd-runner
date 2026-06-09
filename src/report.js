@@ -65,7 +65,7 @@ export function formatBrowserReport(result) {
 }
 
 export function formatAggregate(results) {
-  const width = Math.max(...results.map((r) => r.browser.length));
+  const width = Math.max(0, ...results.map((r) => r.browser.length));
   const lines = ['Cross-browser summary:'];
 
   for (const result of results) {
