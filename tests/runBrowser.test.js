@@ -27,7 +27,7 @@ function mockPage(evaluateResult) {
 function mockBrowser(page) {
   return {
     newPage: vi.fn().mockResolvedValue(page),
-    close: vi.fn(),
+    close: vi.fn().mockResolvedValue(undefined),
   };
 }
 
