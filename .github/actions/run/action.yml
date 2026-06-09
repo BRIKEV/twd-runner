@@ -1,0 +1,31 @@
+name: 'TWD Browsers Run'
+description: 'Run TWD browser tests across Chromium, Firefox, and WebKit with Playwright'
+branding:
+  icon: 'check-circle'
+  color: 'green'
+
+inputs:
+  working-directory:
+    description: 'Directory where twd.config.json lives'
+    required: false
+    default: '.'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Cache Playwright browsers
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: ${{ runner.os }}-playwright-${{ hashFiles(format('{0}/package-lock.json', inputs.working-directory)) }}
+        restore-keys: |
+          ${{ runner.os }}-playwright-
+
+    - name: Install Playwright browsers
+      shell: bash
+      run: npx playwright install --with-deps
+
+    - name: Run TWD tests
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: npx twd-runner run

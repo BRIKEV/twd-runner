@@ -1,0 +1,41 @@
+{
+  "name": "twd-runner",
+  "version": "0.1.0",
+  "description": "Cross-browser test runner for TWD tests using Playwright",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "twd-runner": "./bin/twd-runner.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "vitest",
+    "test:ci": "vitest --run --coverage",
+    "execute:cli": "node ./bin/twd-runner.js",
+    "lock:linux": "docker run --rm -v \"$PWD\":/app -w /app node:24 npm install --package-lock-only"
+  },
+  "keywords": [
+    "twd",
+    "testing",
+    "cli",
+    "playwright",
+    "cross-browser",
+    "browser-testing"
+  ],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "playwright": "^1.60.0"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.1.8",
+    "vitest": "^4.1.8"
+  }
+}
