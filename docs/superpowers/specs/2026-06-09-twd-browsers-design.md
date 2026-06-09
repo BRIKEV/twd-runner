@@ -42,7 +42,6 @@ const DEFAULT_CONFIG = {
   url: 'http://localhost:5173',
   timeout: 10000,
   headless: true,
-  retryCount: 2,
   browsers: ['chromium', 'firefox', 'webkit'], // NEW — default full matrix
   launchArgs: [],                              // optional, applied to every browser launch
 };
@@ -60,7 +59,7 @@ Runs a single browser. Mirrors `twd-cli`'s proven flow:
 2. `const page = await browser.newPage()`
 3. `await page.goto(config.url)`
 4. `await page.waitForSelector('#twd-sidebar-root', { timeout: config.timeout })`
-5. `await page.evaluate(...)` — runs `window.__testRunner` with the **retryCount-aware runner** ported verbatim from `twd-cli/src/index.js` (the `onStart`/`onPass`/`onFail`/`onSkip` callbacks, `retryAttempt`, and `{ retryCount }` option). Returns `{ handlers, testStatus }`.
+5. `await page.evaluate(...)` — runs `window.__testRunner` with `onStart`/`onPass`/`onFail`/`onSkip` callbacks that collect `{ id, status, error }` per test. No retry logic (`retryCount`/`retryAttempt` are intentionally omitted). Returns `{ handlers, testStatus }`.
 6. Always close the browser (success or failure).
 7. Returns a result object: `{ browser: browserType, handlers, testStatus, durationMs, error }` where `error` is set on failure.
 
@@ -125,6 +124,7 @@ Same shape as `twd-cli/bin/twd-cli.js`:
 - CLI flag overrides (`--browser`, `--url`, `--headed`).
 - Screenshots, video, or Playwright trace artifacts.
 - Test sharding / concurrency limits beyond "all browsers at once".
+- Per-test retries (`retryCount` / `retryAttempt`) — not carried over from `twd-cli`.
 - Custom or machine-readable (JSON/JUnit) reporters.
 
 These may be added later if a concrete need arises.
