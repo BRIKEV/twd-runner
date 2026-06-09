@@ -1,0 +1,4 @@
+{
+  "url": "http://localhost:5173",
+  "browsers": ["chromium", "firefox", "webkit"]
+}
