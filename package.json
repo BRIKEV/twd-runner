@@ -1,0 +1,35 @@
+{
+  "name": "twd-browsers",
+  "version": "0.1.0",
+  "description": "Cross-browser test runner for TWD tests using Playwright",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "twd-browsers": "./bin/twd-browsers.js"
+  },
+  "scripts": {
+    "test": "vitest",
+    "test:ci": "vitest --run --coverage",
+    "execute:cli": "node ./bin/twd-browsers.js"
+  },
+  "keywords": [
+    "twd",
+    "testing",
+    "cli",
+    "playwright",
+    "cross-browser",
+    "browser-testing"
+  ],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "playwright": "^1.60.0"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.1.8",
+    "vitest": "^4.1.8"
+  }
+}
