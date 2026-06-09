@@ -75,6 +75,7 @@ export async function runBrowser(browserType, config) {
       error: message,
     };
   } finally {
-    if (browser) await browser.close();
+    // Never let a failing close() mask the result/error we're returning.
+    if (browser) await browser.close().catch(() => {});
   }
 }

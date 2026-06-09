@@ -69,6 +69,19 @@ describe('runBrowser', () => {
     expect(browser.close).toHaveBeenCalled();
   });
 
+  it('still returns an error result (and does not throw) when close() rejects after a failure', async () => {
+    const page = mockPage({});
+    page.evaluate = vi.fn().mockRejectedValue(new Error('evaluate blew up'));
+    const browser = mockBrowser(page);
+    browser.close = vi.fn().mockRejectedValue(new Error('close failed too'));
+    vi.mocked(chromium.launch).mockResolvedValue(browser);
+
+    const result = await runBrowser('chromium', config);
+
+    expect(result.error).toBe('evaluate blew up');
+    expect(browser.close).toHaveBeenCalled();
+  });
+
   it('returns an install hint when the browser binary is missing', async () => {
     vi.mocked(firefox.launch).mockRejectedValue(
       new Error("browserType.launch: Executable doesn't exist at /path/to/firefox")
