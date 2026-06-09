@@ -1,5 +1,7 @@
 # twd-runner
 
+[![E2E Cross-Browser](https://github.com/BRIKEV/twd-runner/actions/workflows/e2e.yml/badge.svg?branch=main)](https://github.com/BRIKEV/twd-runner/actions/workflows/e2e.yml)
+
 Cross-browser headless test runner for [TWD](https://www.npmjs.com/package/twd-js) tests, built on Playwright. Runs your in-browser TWD tests across **Chromium, Firefox, and WebKit in parallel** and reports per-browser and aggregate results.
 
 It is the cross-browser sibling of `twd-cli`. Unlike `twd-cli`, it does **not** collect code coverage or run API contract testing — it focuses purely on executing tests in every major browser engine.
