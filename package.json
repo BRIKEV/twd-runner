@@ -15,7 +15,8 @@
   "scripts": {
     "test": "vitest",
     "test:ci": "vitest --run --coverage",
-    "execute:cli": "node ./bin/twd-runner.js"
+    "execute:cli": "node ./bin/twd-runner.js",
+    "lock:linux": "docker run --rm -v \"$PWD\":/app -w /app node:24 npm install --package-lock-only"
   },
   "keywords": [
     "twd",
