@@ -27,7 +27,10 @@ export async function runBrowser(browserType, config) {
     const page = await browser.newPage();
 
     await page.goto(config.url);
-    await page.waitForSelector('#twd-sidebar-root', { timeout: config.timeout });
+    // Playwright's waitForSelector defaults to state: 'visible'; the TWD sidebar
+    // root is in the DOM but starts hidden (collapsed). Wait for it to be attached
+    // instead, matching Puppeteer/twd-cli semantics, so headless runs don't time out.
+    await page.waitForSelector('#twd-sidebar-root', { timeout: config.timeout, state: 'attached' });
 
     const { handlers, testStatus } = await page.evaluate(async () => {
       const TestRunner = window.__testRunner;

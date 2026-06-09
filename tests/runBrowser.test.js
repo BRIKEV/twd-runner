@@ -47,7 +47,7 @@ describe('runBrowser', () => {
 
     expect(chromium.launch).toHaveBeenCalledWith({ headless: true, args: ['--x'] });
     expect(page.goto).toHaveBeenCalledWith('http://localhost:5173');
-    expect(page.waitForSelector).toHaveBeenCalledWith('#twd-sidebar-root', { timeout: 10000 });
+    expect(page.waitForSelector).toHaveBeenCalledWith('#twd-sidebar-root', { timeout: 10000, state: 'attached' });
     expect(result.browser).toBe('chromium');
     expect(result.handlers).toEqual(handlers);
     expect(result.testStatus).toEqual(testStatus);
