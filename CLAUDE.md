@@ -4,21 +4,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-twd-browsers is a CLI tool for running TWD (Test While Developing) browser-based tests across Chromium, Firefox, and WebKit using Playwright. It is the cross-browser sibling of `twd-cli`: same in-browser execution model, but multi-engine and parallel, with **no code coverage and no contract testing** (those stay in `twd-cli`).
+twd-runner is a CLI tool for running TWD (Test While Developing) browser-based tests across Chromium, Firefox, and WebKit using Playwright. It is the cross-browser sibling of `twd-cli`: same in-browser execution model, but multi-engine and parallel, with **no code coverage and no contract testing** (those stay in `twd-cli`).
 
 ## Commands
 
 - `npm test` — Run tests in watch mode (vitest)
 - `npm run test:ci` — Run tests once with V8 coverage
-- `npm run execute:cli` — Run the CLI locally (`node ./bin/twd-browsers.js`)
-- `npx twd-browsers run` — Run TWD tests across configured browsers (user-facing)
+- `npm run execute:cli` — Run the CLI locally (`node ./bin/twd-runner.js`)
+- `npx twd-runner run` — Run TWD tests across configured browsers (user-facing)
 - `npx playwright install` — Install browser binaries (required before first real run)
 
 ## Architecture
 
 ESM-only Node.js CLI:
 
-- **`bin/twd-browsers.js`** — CLI entry. Parses `run`, calls `runAll()`, exits 0 (pass) / 1 (failure).
+- **`bin/twd-runner.js`** — CLI entry. Parses `run`, calls `runAll()`, exits 0 (pass) / 1 (failure).
 - **`src/config.js`** — `loadConfig()` reads `twd.config.json`, merges with defaults (url, timeout, headless, browsers, launchArgs). Coverage/contract keys are ignored.
 - **`src/runBrowser.js`** — `runBrowser(browserType, config)` launches one Playwright engine, navigates, waits for `#twd-sidebar-root`, runs `window.__testRunner` in `page.evaluate`, and always closes the browser. Errors (including missing-browser) become an `error` field on the result object instead of throwing.
 - **`src/index.js`** — `runAll()` fans out `runBrowser` over `config.browsers` with `Promise.allSettled` (parallel, isolated), prints each browser's buffered report then the aggregate, returns `hasFailures`.

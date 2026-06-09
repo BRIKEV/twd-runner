@@ -69,4 +69,4 @@ jobs:
 
       - name: Run TWD tests across browsers (local CLI)
         working-directory: test-example-app
-        run: node ../bin/twd-browsers.js run
+        run: node ../bin/twd-runner.js run

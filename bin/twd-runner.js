@@ -14,10 +14,10 @@ if (command === 'run') {
   }
 } else {
   console.log(`
-twd-browsers - Cross-browser test runner for TWD tests (Playwright)
+twd-runner - Cross-browser test runner for TWD tests (Playwright)
 
 Usage:
-  npx twd-browsers run    Run all tests across the configured browsers
+  npx twd-runner run    Run all tests across the configured browsers
 
 Options:
   Create a twd.config.json file in your project root to customize settings.

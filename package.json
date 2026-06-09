@@ -1,11 +1,11 @@
 {
-  "name": "twd-browsers",
+  "name": "twd-runner",
   "version": "0.1.0",
   "description": "Cross-browser test runner for TWD tests using Playwright",
   "type": "module",
   "main": "src/index.js",
   "bin": {
-    "twd-browsers": "./bin/twd-browsers.js"
+    "twd-runner": "./bin/twd-runner.js"
   },
   "files": [
     "bin",
@@ -15,7 +15,7 @@
   "scripts": {
     "test": "vitest",
     "test:ci": "vitest --run --coverage",
-    "execute:cli": "node ./bin/twd-browsers.js"
+    "execute:cli": "node ./bin/twd-runner.js"
   },
   "keywords": [
     "twd",

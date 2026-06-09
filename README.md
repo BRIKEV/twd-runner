@@ -1,4 +1,4 @@
-# twd-browsers
+# twd-runner
 
 Cross-browser headless test runner for [TWD](https://www.npmjs.com/package/twd-js) tests, built on Playwright. Runs your in-browser TWD tests across **Chromium, Firefox, and WebKit in parallel** and reports per-browser and aggregate results.
 
@@ -7,7 +7,7 @@ It is the cross-browser sibling of `twd-cli`. Unlike `twd-cli`, it does **not** 
 ## Install
 
 ```bash
-npm install -D twd-browsers
+npm install -D twd-runner
 npx playwright install
 ```
 
@@ -16,7 +16,7 @@ npx playwright install
 Start your dev server (with the TWD sidebar mounted), then:
 
 ```bash
-npx twd-browsers run
+npx twd-runner run
 ```
 
 Exit code is `0` when every browser passes, `1` if any browser has a failing test or fails to launch.
