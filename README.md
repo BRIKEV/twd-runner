@@ -36,3 +36,40 @@ Reads the same `twd.config.json` as `twd-cli` (coverage/contract keys are ignore
 | `launchArgs` | `[]` | Extra args passed to every browser launch |
 
 If a configured browser isn't installed, the run prints `npx playwright install <browser>` and exits non-zero.
+
+## GitHub Action
+
+This repo ships a reusable composite action that caches the Playwright browsers, installs them, and runs `twd-runner` across the configured engines. Add `twd-runner` to your project's `devDependencies`, start your dev server, then call the action:
+
+```yaml
+name: Cross-browser
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  cross-browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+
+      - name: Start dev server
+        run: |
+          nohup npm run dev > dev.log 2>&1 &
+          npx wait-on http://localhost:5173
+
+      - name: Run TWD tests across browsers
+        uses: BRIKEV/twd-runner/.github/actions/run@main
+        with:
+          working-directory: .   # directory containing twd.config.json (default ".")
+```
+
+The action reads `twd.config.json` and runs every engine listed in `browsers` (default: chromium, firefox, webkit), exiting non-zero if any browser has a failing test.
