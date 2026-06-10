@@ -20,6 +20,7 @@ function mockPage(evaluateResult) {
   return {
     goto: vi.fn(),
     waitForSelector: vi.fn(),
+    waitForFunction: vi.fn(),
     evaluate: vi.fn().mockResolvedValue(evaluateResult),
   };
 }
@@ -54,6 +55,26 @@ describe('runBrowser', () => {
     expect(typeof result.durationMs).toBe('number');
     expect(result.error).toBeUndefined();
     expect(browser.close).toHaveBeenCalled();
+  });
+
+  it('does not wait for a service worker by default', async () => {
+    const page = mockPage({ handlers: [], testStatus: [] });
+    const browser = mockBrowser(page);
+    vi.mocked(chromium.launch).mockResolvedValue(browser);
+
+    await runBrowser('chromium', config);
+
+    expect(page.waitForFunction).not.toHaveBeenCalled();
+  });
+
+  it('waits for the service worker to control the page when waitForServiceWorker is set', async () => {
+    const page = mockPage({ handlers: [], testStatus: [] });
+    const browser = mockBrowser(page);
+    vi.mocked(chromium.launch).mockResolvedValue(browser);
+
+    await runBrowser('chromium', { ...config, waitForServiceWorker: true });
+
+    expect(page.waitForFunction).toHaveBeenCalledWith(expect.any(Function), { timeout: 10000 });
   });
 
   it('closes the browser and returns an error result when navigation fails', async () => {

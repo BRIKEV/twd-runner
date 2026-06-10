@@ -12,6 +12,7 @@ const DEFAULTS = {
   browsers: ['chromium', 'firefox', 'webkit'],
   launchArgs: [],
   concurrency: 0,
+  waitForServiceWorker: false,
 };
 
 describe('loadConfig', () => {

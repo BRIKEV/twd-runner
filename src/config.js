@@ -8,6 +8,7 @@ const DEFAULT_CONFIG = {
   browsers: ['chromium', 'firefox', 'webkit'],
   launchArgs: [],
   concurrency: 0,
+  waitForServiceWorker: false,
 };
 
 export function loadConfig() {

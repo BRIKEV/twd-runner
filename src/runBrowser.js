@@ -32,6 +32,19 @@ export async function runBrowser(browserType, config) {
     // instead, matching Puppeteer/twd-cli semantics, so headless runs don't time out.
     await page.waitForSelector('#twd-sidebar-root', { timeout: config.timeout, state: 'attached' });
 
+    // Opt-in: wait until a service worker actually CONTROLS the page before running
+    // tests. twd-js registers each mock via navigator.serviceWorker.controller?.post-
+    // Message(...), which silently drops the rule if the worker isn't controlling yet.
+    // Chromium claims control fast; Firefox/WebKit can be late (esp. headless/CI), so
+    // mocks registered in that window vanish. Once the worker controls the page it
+    // stays in control, so waiting here guarantees every later mockRequest lands.
+    if (config.waitForServiceWorker) {
+      await page.waitForFunction(
+        () => Boolean(navigator.serviceWorker && navigator.serviceWorker.controller),
+        { timeout: config.timeout }
+      );
+    }
+
     const { handlers, testStatus } = await page.evaluate(async () => {
       const TestRunner = window.__testRunner;
       const testStatus = [];
