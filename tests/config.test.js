@@ -11,6 +11,7 @@ const DEFAULTS = {
   headless: true,
   browsers: ['chromium', 'firefox', 'webkit'],
   launchArgs: [],
+  concurrency: 0,
 };
 
 describe('loadConfig', () => {

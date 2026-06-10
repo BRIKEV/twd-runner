@@ -1,6 +1,6 @@
 {
   "name": "twd-runner",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Cross-browser test runner for TWD tests using Playwright",
   "type": "module",
   "main": "src/index.js",

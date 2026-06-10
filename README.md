@@ -34,6 +34,7 @@ Reads the same `twd.config.json` as `twd-cli` (coverage/contract keys are ignore
 | `headless` | `true` | Run browsers headless |
 | `browsers` | `["chromium","firefox","webkit"]` | Which engines to run, in parallel |
 | `launchArgs` | `[]` | Extra args passed to every browser launch |
+| `concurrency` | `0` | Max browsers running at once. `0` means all in parallel. Set `1` (sequential) on constrained CI runners, where parallel engines contend for CPU and slow each other down. |
 
 If a configured browser isn't installed, the run prints `npx playwright install <browser>` and exits non-zero.
 

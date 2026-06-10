@@ -7,10 +7,13 @@ const command = process.argv[2];
 if (command === 'run') {
   try {
     const hasFailures = await runAll();
-    process.exit(hasFailures ? 1 : 0);
+    // Set exitCode (don't call process.exit) so Node flushes buffered stdout
+    // before exiting. process.exit() truncates unflushed output when stdout is
+    // a pipe (e.g. CI), which would cut off later browser reports + the summary.
+    process.exitCode = hasFailures ? 1 : 0;
   } catch (error) {
     console.error('Error running tests:', error);
-    process.exit(1);
+    process.exitCode = 1;
   }
 } else {
   console.log(`
@@ -23,5 +26,5 @@ Options:
   Create a twd.config.json file in your project root to customize settings.
   Set "browsers": ["chromium", "firefox", "webkit"] to choose which browsers run.
   `);
-  process.exit(command ? 1 : 0);
+  process.exitCode = command ? 1 : 0;
 }

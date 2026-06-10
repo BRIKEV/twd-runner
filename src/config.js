@@ -7,6 +7,7 @@ const DEFAULT_CONFIG = {
   headless: true,
   browsers: ['chromium', 'firefox', 'webkit'],
   launchArgs: [],
+  concurrency: 0,
 };
 
 export function loadConfig() {

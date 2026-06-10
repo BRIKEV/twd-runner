@@ -41,6 +41,57 @@ describe('runAll', () => {
     expect(runBrowser).toHaveBeenCalledWith('firefox', expect.any(Object));
   });
 
+  it('runs browsers one at a time when concurrency is 1', async () => {
+    vi.mocked(loadConfig).mockReturnValue({
+      url: 'http://localhost:5173',
+      timeout: 10000,
+      headless: true,
+      browsers: ['chromium', 'firefox', 'webkit'],
+      launchArgs: [],
+      concurrency: 1,
+    });
+
+    let inFlight = 0;
+    let maxInFlight = 0;
+    vi.mocked(runBrowser).mockImplementation(async (browser) => {
+      inFlight += 1;
+      maxInFlight = Math.max(maxInFlight, inFlight);
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      inFlight -= 1;
+      return { browser, handlers: [], testStatus: [{ id: '1', status: 'pass' }], durationMs: 1 };
+    });
+
+    await runAll();
+
+    expect(maxInFlight).toBe(1);
+    expect(runBrowser).toHaveBeenCalledTimes(3);
+  });
+
+  it('runs all browsers at once when concurrency is 0 (default)', async () => {
+    vi.mocked(loadConfig).mockReturnValue({
+      url: 'http://localhost:5173',
+      timeout: 10000,
+      headless: true,
+      browsers: ['chromium', 'firefox', 'webkit'],
+      launchArgs: [],
+      concurrency: 0,
+    });
+
+    let inFlight = 0;
+    let maxInFlight = 0;
+    vi.mocked(runBrowser).mockImplementation(async (browser) => {
+      inFlight += 1;
+      maxInFlight = Math.max(maxInFlight, inFlight);
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      inFlight -= 1;
+      return { browser, handlers: [], testStatus: [{ id: '1', status: 'pass' }], durationMs: 1 };
+    });
+
+    await runAll();
+
+    expect(maxInFlight).toBe(3);
+  });
+
   it('returns false when all browsers pass', async () => {
     vi.mocked(runBrowser).mockResolvedValue({
       browser: 'x',
