@@ -37,7 +37,7 @@ Reads the same `twd.config.json` as `twd-cli` (coverage/contract keys are ignore
 | `concurrency` | `0` | Max browsers running at once. `0` means all in parallel. Set `1` (sequential) on constrained CI runners, where parallel engines contend for CPU and slow each other down. |
 | `waitForServiceWorker` | `false` | Wait for a service worker to control the page before running tests. Enable this for apps that mock requests via a service worker (e.g. MSW): Firefox/WebKit can be slow to take control, and mocks registered before then are silently lost. Leave `false` for apps with no service worker. |
 
-When `waitForServiceWorker` is enabled, the runner first warms the dev server with one throwaway Chromium page load — a cold Vite server forces an optimizeDeps reload on first load that races SW registration, which Chromium shrugs off but Firefox/WebKit time out on (especially in parallel/matrix jobs, each with its own cold server). This is automatic and best-effort: nothing to configure, and a warm-up that can't complete just logs a warning and continues.
+When `waitForServiceWorker` is enabled, the runner first warms the dev server with one throwaway Chromium page load — a cold Vite server forces an optimizeDeps reload on first load that races SW registration, which Chromium shrugs off but Firefox/WebKit time out on (common in CI, where the server starts cold). This is automatic and best-effort: nothing to configure, and a warm-up that can't complete just logs a warning and continues.
 
 If a configured browser isn't installed, the run prints `npx playwright install <browser>` and exits non-zero.
 
@@ -77,3 +77,7 @@ jobs:
 ```
 
 The action reads `twd.config.json` and runs every engine listed in `browsers` (default: chromium, firefox, webkit), exiting non-zero if any browser has a failing test.
+
+This is just one job — `npx twd-runner run` launches the configured engines in parallel inside a single runner, so the same two steps (start dev server, run the runner) work unchanged on any CI: GitLab, CircleCI, Jenkins, etc. No CI-specific orchestration required.
+
+> **Optional:** on GitHub Actions you *can* fan each engine out into its own matrix job (set `browsers` to a single engine per job) for full per-engine isolation. It's rarely necessary — a single parallel job is simpler and portable — so reach for the matrix only if you specifically want each engine on its own runner.
