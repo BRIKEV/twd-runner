@@ -37,6 +37,8 @@ Reads the same `twd.config.json` as `twd-cli` (coverage/contract keys are ignore
 | `concurrency` | `0` | Max browsers running at once. `0` means all in parallel. Set `1` (sequential) on constrained CI runners, where parallel engines contend for CPU and slow each other down. |
 | `waitForServiceWorker` | `false` | Wait for a service worker to control the page before running tests. Enable this for apps that mock requests via a service worker (e.g. MSW): Firefox/WebKit can be slow to take control, and mocks registered before then are silently lost. Leave `false` for apps with no service worker. |
 
+When `waitForServiceWorker` is enabled, the runner first warms the dev server with one throwaway Chromium page load — a cold Vite server forces an optimizeDeps reload on first load that races SW registration, which Chromium shrugs off but Firefox/WebKit time out on (especially in parallel/matrix jobs, each with its own cold server). This is automatic and best-effort: nothing to configure, and a warm-up that can't complete just logs a warning and continues.
+
 If a configured browser isn't installed, the run prints `npx playwright install <browser>` and exits non-zero.
 
 ## GitHub Action
