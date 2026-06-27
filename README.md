@@ -13,6 +13,10 @@ npm install -D twd-runner
 npx playwright install
 ```
 
+`npm install` pulls in the Playwright library but **not** the browser binaries — `npx playwright install` downloads them. Install all three engines (the default): even if you only test Firefox/WebKit, the service-worker warm-up drives a Chromium page load, so Chromium needs to be present.
+
+In CI you don't need the manual step — the [composite action](#github-action) runs `npx playwright install --with-deps` for you.
+
 ## Usage
 
 Start your dev server (with the TWD sidebar mounted), then:
