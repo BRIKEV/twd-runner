@@ -1,5 +1,5 @@
 import { loadConfig } from './config.js';
-import { runBrowser } from './runBrowser.js';
+import { runBrowser, warmUp } from './runBrowser.js';
 import { formatBrowserReport, formatAggregate, isBrowserFailure } from './report.js';
 
 // Run runBrowser but never throw: any rejection becomes an error result so one
@@ -43,6 +43,20 @@ export async function runAll() {
 
   console.log('Starting TWD cross-browser test runner...');
   console.log('Configuration:', JSON.stringify(config, null, 2));
+
+  // When tests depend on a service worker, a cold dev server races SW
+  // registration and Firefox/WebKit time out claiming control. Warm the server
+  // with one throwaway load first so every engine starts hot. This is internal
+  // to waitForServiceWorker — there's no separate knob to manage.
+  if (config.waitForServiceWorker) {
+    console.log('Warming up the dev server before the run...');
+    const warm = await warmUp(config);
+    if (warm.ok) {
+      console.log(`Warm-up complete via ${warm.browser}.`);
+    } else {
+      console.warn(`Warning: warm-up did not complete${warm.error ? ` (${warm.error})` : ''}; continuing anyway.`);
+    }
+  }
 
   const results = await runBrowsers(config.browsers, config);
 

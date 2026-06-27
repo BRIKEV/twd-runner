@@ -6,8 +6,8 @@ vi.mock('playwright', () => ({
   webkit: { launch: vi.fn() },
 }));
 
-import { chromium, firefox } from 'playwright';
-import { runBrowser } from '../src/runBrowser.js';
+import { chromium, firefox, webkit } from 'playwright';
+import { runBrowser, warmUp } from '../src/runBrowser.js';
 
 const config = {
   url: 'http://localhost:5173',
@@ -74,7 +74,11 @@ describe('runBrowser', () => {
 
     await runBrowser('chromium', { ...config, waitForServiceWorker: true });
 
-    expect(page.waitForFunction).toHaveBeenCalledWith(expect.any(Function), { timeout: 10000 });
+    // timeout must be in the options (third) slot — passing it second lands it in
+    // `arg` and Playwright silently uses its 30s default instead of config.timeout.
+    expect(page.waitForFunction).toHaveBeenCalledWith(expect.any(Function), undefined, {
+      timeout: 10000,
+    });
   });
 
   it('closes the browser and returns an error result when navigation fails', async () => {
@@ -120,5 +124,80 @@ describe('runBrowser', () => {
 
     expect(result.error).toContain('Unknown browser "safari"');
     expect(result.handlers).toEqual([]);
+  });
+});
+
+describe('warmUp', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('warms with Chromium and waits for the SW when enabled', async () => {
+    const page = mockPage({});
+    const browser = mockBrowser(page);
+    vi.mocked(chromium.launch).mockResolvedValue(browser);
+
+    const result = await warmUp({
+      ...config,
+      waitForServiceWorker: true,
+      browsers: ['firefox'],
+    });
+
+    expect(result).toEqual({ ok: true, browser: 'chromium' });
+    expect(chromium.launch).toHaveBeenCalled();
+    expect(page.goto).toHaveBeenCalledWith('http://localhost:5173');
+    expect(page.waitForSelector).toHaveBeenCalledWith('#twd-sidebar-root', {
+      timeout: 10000,
+      state: 'attached',
+    });
+    expect(page.waitForFunction).toHaveBeenCalledWith(expect.any(Function), undefined, {
+      timeout: 10000,
+    });
+    expect(browser.close).toHaveBeenCalled();
+  });
+
+  it('falls back to a configured engine when the warm-up browser is not installed', async () => {
+    vi.mocked(chromium.launch).mockRejectedValue(
+      new Error("browserType.launch: Executable doesn't exist at /path/to/chromium")
+    );
+    const page = mockPage({});
+    const browser = mockBrowser(page);
+    vi.mocked(firefox.launch).mockResolvedValue(browser);
+
+    const result = await warmUp({
+      ...config,
+      browsers: ['firefox', 'webkit'],
+    });
+
+    expect(result).toEqual({ ok: true, browser: 'firefox' });
+    expect(chromium.launch).toHaveBeenCalled();
+    expect(firefox.launch).toHaveBeenCalled();
+  });
+
+  it('is best-effort: a non-missing-browser failure returns ok:false without throwing', async () => {
+    const page = mockPage({});
+    page.waitForSelector = vi.fn().mockRejectedValue(new Error('sidebar never appeared'));
+    const browser = mockBrowser(page);
+    vi.mocked(chromium.launch).mockResolvedValue(browser);
+
+    const result = await warmUp({ ...config, browsers: ['chromium'] });
+
+    expect(result.ok).toBe(false);
+    expect(result.error).toBe('sidebar never appeared');
+    expect(browser.close).toHaveBeenCalled();
+  });
+
+  it('reports when no warm-up engine is available', async () => {
+    vi.mocked(chromium.launch).mockRejectedValue(
+      new Error("browserType.launch: Executable doesn't exist at /path/to/chromium")
+    );
+    vi.mocked(webkit.launch).mockRejectedValue(
+      new Error("browserType.launch: Executable doesn't exist at /path/to/webkit")
+    );
+
+    const result = await warmUp({ ...config, browsers: ['webkit'] });
+
+    expect(result.ok).toBe(false);
+    expect(result.error).toBe('No warm-up browser available.');
   });
 });
