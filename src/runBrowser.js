@@ -39,8 +39,14 @@ export async function runBrowser(browserType, config) {
     // mocks registered in that window vanish. Once the worker controls the page it
     // stays in control, so waiting here guarantees every later mockRequest lands.
     if (config.waitForServiceWorker) {
+      // waitForFunction's signature is (pageFunction, arg, options). The timeout
+      // MUST go in the third (options) slot — passing it second puts it in `arg`,
+      // so the option is ignored and the wait silently falls back to Playwright's
+      // 30s default. That cap is too low for Firefox/WebKit claiming the SW in
+      // headless CI, where they routinely need longer than 30s.
       await page.waitForFunction(
         () => Boolean(navigator.serviceWorker && navigator.serviceWorker.controller),
+        undefined,
         { timeout: config.timeout }
       );
     }

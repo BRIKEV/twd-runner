@@ -74,7 +74,11 @@ describe('runBrowser', () => {
 
     await runBrowser('chromium', { ...config, waitForServiceWorker: true });
 
-    expect(page.waitForFunction).toHaveBeenCalledWith(expect.any(Function), { timeout: 10000 });
+    // timeout must be in the options (third) slot — passing it second lands it in
+    // `arg` and Playwright silently uses its 30s default instead of config.timeout.
+    expect(page.waitForFunction).toHaveBeenCalledWith(expect.any(Function), undefined, {
+      timeout: 10000,
+    });
   });
 
   it('closes the browser and returns an error result when navigation fails', async () => {
